@@ -5,16 +5,14 @@
 #include <conio.h>
 
 int main(int argc, char* argv[]) {
-    const int TARGET_FPS = 1000;
+    const unsigned short int TARGET_FPS = 30;
     FrameRateManager frameRateManager(TARGET_FPS);
 
-    const int SCREEN_WIDTH = 50;
-    const int SCREEN_HEIGHT = 20;
-
+    const unsigned short int SCREEN_WIDTH = 70;
+    const unsigned short int SCREEN_HEIGHT = 20;
     ScreenRenderer::Initialize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     bool running = true;
-
     while (running) {
         if (_kbhit()) {
             char ch = _getch();
@@ -23,7 +21,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        ScreenRenderer::DrawScreen(frameRateManager.GetFPS(), SCREEN_WIDTH, SCREEN_HEIGHT);
+        ScreenRenderer::DrawScreen(frameRateManager.GetFPS());
         frameRateManager.Wait();
     }
     

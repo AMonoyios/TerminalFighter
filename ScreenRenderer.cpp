@@ -1,43 +1,59 @@
 ﻿#include "Headers/ScreenRenderer.h"
+#include "Headers/FrameRateManager.h"
+
 #include <iostream>
 
 #ifdef _WIN32
     #include <windows.h>
-    #define CLEAR_SCREEN "cls"
 #else
     #include <unistd.h>
-    #define CLEAR_SCREEN "clear"
 #endif
 
-vector<string> ScreenRenderer::screenBuffer;
-int ScreenRenderer::screenWidth = 0;
-int ScreenRenderer::screenHeight = 0;
+void ScreenRenderer::Initialize(unsigned short int width, unsigned short int height) {
+    SHORT screenWidth = static_cast<SHORT>(width);
+    SHORT screenHeight = static_cast<SHORT>(height);
+    
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD bufferSize = { screenWidth, screenHeight };
+    SMALL_RECT windowSize = { 0, 0, screenWidth, screenHeight };
 
-void ScreenRenderer::FlushBuffer() {
-    system(CLEAR_SCREEN);
-
-    for (const string& line : screenBuffer) {
-        std::cout << line << '\n';
-    }
+    SetConsoleScreenBufferSize(hConsole, bufferSize);
+    SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
 }
 
-void ScreenRenderer::Initialize(int width, int height) {
-    screenWidth = width;
-    screenHeight = height;
+void ScreenRenderer::DrawScreen(double fps) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD cursorPos = {0, 0};
+    SetConsoleCursorPosition(hConsole, cursorPos);
 
-    screenBuffer.resize(screenHeight, string(screenWidth, ' '));
+    DrawTerrain();
+    DrawBuildings();
+    DrawInteractables();
+    DrawPlayer();
+    DrawGUI(fps);
 }
 
-void ScreenRenderer::DrawScreen(double fps, int width, int height) {
-    for (int i = 0; i < height; ++i) {
-        screenBuffer[i] = string(width, ' ');
-    }
+void ScreenRenderer::DrawTerrain() {
+    cout << "Drawing terrain..." << '\n';
+    cout << "  Trees and bushes here!" << '\n';
+}
 
-    screenBuffer[0].replace(0, 10, "FPS: " + to_string(int(fps)));
+void ScreenRenderer::DrawBuildings() {
+    cout << "Drawing buildings..." << '\n';
+    cout << "  House at (10, 10)" << '\n';
+}
 
-    int midY = height / 2;
-    int midX = width / 2 - 5;
-    screenBuffer[midY].replace(midX, 10, "Running...");
+void ScreenRenderer::DrawInteractables() {
+    cout << "Drawing interactables..." << '\n';
+    cout << "  Enemy at (20, 15)" << '\n';
+}
 
-    FlushBuffer();
+void ScreenRenderer::DrawPlayer() {
+    cout << "Drawing player..." << '\n';
+    cout << "  Player at (30, 10)" << '\n';
+}
+
+void ScreenRenderer::DrawGUI(double fps) {
+    cout << "Drawing GUI..." << '\n';
+    cout << "  FPS: " << fps << '\n';
 }

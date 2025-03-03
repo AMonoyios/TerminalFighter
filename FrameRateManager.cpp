@@ -1,31 +1,38 @@
 ﻿#include "Headers/FrameRateManager.h"
 
-FrameRateManager::FrameRateManager(unsigned short int targetFPS) : targetFPS(targetFPS) {
+FrameRateManager::FrameRateManager(double targetFPS) : targetFrameDuration(1000.0 / targetFPS) {
     lastFrameTime = high_resolution_clock::now();
 }
 
 void FrameRateManager::Wait() {
     time_point<steady_clock> now = high_resolution_clock::now();
-    duration<double> frameTime = now - lastFrameTime;
+    double elapsedMs = duration<double, std::milli>(now - lastFrameTime).count();
 
-    double targetFrameTime = 1.0 / targetFPS;
-    double sleepTime = targetFrameTime - frameTime.count();
-
-    if (sleepTime > 0.0) {
-        this_thread::sleep_for(duration<double>(sleepTime));
+    double waitTime = targetFrameDuration - elapsedMs;
+    if (waitTime > 0) {
+        this_thread::sleep_for(milliseconds(static_cast<int>(waitTime)));
     }
 
-    lastFrameTime = high_resolution_clock::now();
+    time_point<steady_clock> frameEnd = high_resolution_clock::now();
+    double frameTime = duration<double, std::milli>(frameEnd - lastFrameTime).count();
+    lastFrameTime = frameEnd;
 
-    frameCount++;
-    elapsedTime += frameTime.count();
-    if (elapsedTime >= 1.0) {
-        fps = frameCount / elapsedTime;
-        frameCount = 0;
-        elapsedTime = 0.0;
+    frameTimes.push_back(frameTime);
+    if (frameTimes.size() > 10) { // Keep last 10 frames
+        frameTimes.pop_front();
     }
 }
 
 double FrameRateManager::GetFPS() const {
-    return fps;
+    if (frameTimes.empty()) {
+        return 0.0;
+    }
+    
+    double avgFrameTime = 0;
+    for (double t : frameTimes) {
+        avgFrameTime += t;
+    }
+    avgFrameTime /= frameTimes.size();
+
+    return avgFrameTime > 0 ? (1000.0 / avgFrameTime) : targetFrameDuration;
 }

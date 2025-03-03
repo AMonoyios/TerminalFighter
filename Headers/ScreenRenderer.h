@@ -1,7 +1,6 @@
 ﻿#ifndef ScreenRenderer_h
 #define ScreenRenderer_h
 
-#include <string>
 #include <vector>
 
 using namespace std;
@@ -9,15 +8,15 @@ using namespace std;
 class ScreenRenderer {
 
 private:
-    static vector<string> screenBuffer;
-    static int screenWidth;
-    static int screenHeight;
-
-    static void FlushBuffer();
+    static void DrawTerrain();
+    static void DrawBuildings();
+    static void DrawInteractables();
+    static void DrawPlayer();
+    static void DrawGUI(double fps);
     
 public:
-    static void DrawScreen(double fps, int width, int height);
-    static void Initialize(int width, int height);
+    static void DrawScreen(double fps);
+    static void Initialize(unsigned short int width, unsigned short int height);
 
 };
 

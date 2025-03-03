@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <thread>
+#include <deque>
 
 using namespace std;
 using namespace std::chrono;
@@ -10,16 +11,12 @@ using namespace std::chrono;
 class FrameRateManager {
 
 private:
-    unsigned short int targetFPS;
-
     high_resolution_clock::time_point lastFrameTime;
-
-    unsigned short int frameCount = 0;
-    double elapsedTime = 0.0;
-    double fps = 0.0;
+    double targetFrameDuration;
+    deque<double> frameTimes;
 
 public:
-    FrameRateManager(unsigned short int targetFPS);
+    FrameRateManager(double targetFPS);
     
     void Wait();
     double GetFPS() const;
